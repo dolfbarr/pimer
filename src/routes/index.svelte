@@ -1,2 +1,7 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<div class="container mx-auto min-h-screen w-max flex">
+  <div class="object-center self-center">
+    <h1 class="text-3xl font-bold underline">
+      Hello world!
+    </h1>
+  </div>
+</div>
