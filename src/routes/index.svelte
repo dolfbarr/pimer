@@ -1,31 +1,57 @@
 <script>
-  import play from '/play.svg';
-  import pause from '/pause.svg';
-  import chevronLeft from '/chevron-left.svg';
-  import chevronRight from '/chevron-right.svg';
+  import play from '/play.svg'
+  import pause from '/pause.svg'
+  import chevronLeft from '/chevron-left.svg'
+  import chevronRight from '/chevron-right.svg'
 
-  import { tweened } from 'svelte/motion';
+  import { tweened } from 'svelte/motion'
 
   const SECOND_IN_MS = 1000
-  const MINUTE_IN_MS = 60 * SECOND_IN_MS;
+  const MINUTE_IN_MS = 60 * SECOND_IN_MS
 
-  let workTimer = tweened(2 * MINUTE_IN_MS);
-  const breakTimer = 5 * MINUTE_IN_MS;
+  const WORK_TIMER = 'WORK_TIMER'
+  const BREAK_TIMER = 'BREAK_TIMER'
 
-  let isTimerGoing = false;
-  const startTimer = () => {
-    isTimerGoing = true;
+  const  timers = {
+    [WORK_TIMER]: 0.1 * MINUTE_IN_MS,
+    [BREAK_TIMER]: 0.2 * MINUTE_IN_MS,
+  }
+  let session = []
+  let isTimerGoing = false
+  let isTimerPaused = false
 
-    setInterval(() => {
-      if ($workTimer > 0) {
-        $workTimer -= 1000;
-      }
-    }, SECOND_IN_MS);
+  let currentTimer, currentTimerName
 
-    if ($workTimer === 0 && isTimerGoing) {
-      isTimerGoing = false
-      workTimer = tweened(2 * MINUTE_IN_MS)
+  const pickNextTimer = () => {
+    if (session.length && session[session.length - 1] === WORK_TIMER) {
+      currentTimer = tweened(timers[BREAK_TIMER])
+      currentTimerName = BREAK_TIMER
+    } else {
+      currentTimer = tweened(timers[WORK_TIMER])
+      currentTimerName = WORK_TIMER
     }
+  }
+
+  pickNextTimer()
+
+  const startTimer = () => {
+    console.log({session, currentTimerName}, $currentTimer)
+    isTimerGoing = true
+
+    const timerInterval = setInterval(function () {
+      if (!isTimerPaused) {
+        if ($currentTimer > 0) {
+          $currentTimer -= 1000
+        }
+      }
+
+      if ($currentTimer === 0 && isTimerGoing) {
+        isTimerGoing = false
+        session = [...session, currentTimerName]
+        pickNextTimer()
+        clearInterval(timerInterval)
+      }
+    }, SECOND_IN_MS)
   }
 </script>
 
@@ -35,7 +61,7 @@
         <button class="self-center text-3xl">
           <img src={chevronLeft} alt="chevron left icon" />
         </button>
-        <span>{Math.floor($workTimer / MINUTE_IN_MS)}<span class="animate-pulse align-text-top">:</span>{Math.floor(($workTimer - Math.floor($workTimer / MINUTE_IN_MS) * MINUTE_IN_MS)/SECOND_IN_MS)}</span>
+        <span>{Math.floor($currentTimer / MINUTE_IN_MS)}<span class="animate-pulse align-text-top">:</span>{Math.floor(($currentTimer - Math.floor($currentTimer / MINUTE_IN_MS) * MINUTE_IN_MS)/SECOND_IN_MS)}</span>
         <button class="self-center text-3xl">
           <img src={chevronRight} alt="chevron left icon" />
         </button>
