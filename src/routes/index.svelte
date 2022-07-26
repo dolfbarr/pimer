@@ -1,4 +1,5 @@
 <script>
+  import { browser } from "$app/env";
   import { tweened } from 'svelte/motion'
   import { fade, draw } from 'svelte/transition'
   import Setting from './setting.svelte'
@@ -30,6 +31,7 @@
   let isTimerGoing = false
   let isTimerPaused = false
   let isSettingsVisible = false
+  let isDarkMode = browser && (localStorage.theme === 'dark' || document.documentElement.classList.contains('dark'))
 
   let currentTimer, currentTimerName
 
@@ -101,18 +103,32 @@
   const toggleSettings = () => {
     isSettingsVisible = !isSettingsVisible
   }
+
+  const toggleDarkMode = () => {
+   if (browser) {
+      if (document.documentElement.classList.contains('dark')) {
+        isDarkMode = false
+        localStorage.theme = 'light'
+        document.documentElement.classList.remove('dark')
+      } else {
+        isDarkMode = true
+        localStorage.theme = 'dark'
+        document.documentElement.classList.add('dark')
+      }
+   }
+  }
 </script>
 
-<div class="container relative mx-auto min-h-screen min-w-full flex justify-center transition-[background-color] duration-500 {currentTimerName !== WORK_TIMER && 'bg-lime-500'} {currentTimerName !== WORK_TIMER && 'text-white'}">
+<div class="container relative mx-auto min-h-screen min-w-full flex justify-center transition-[background-color] duration-500 {currentTimerName !== WORK_TIMER && 'bg-lime-500 dark:bg-lime-800'} {currentTimerName !== WORK_TIMER && 'text-white dark:text-zinc-200 selection:bg-zinc-600'}">
   <div class="absolute top-0 left-0 p-5 flex flex-col max-h-screen">
-    <button class="h-12 w-12 active:scale-95 transition-all self-auto mx-4 my-2" on:click={toggleSettings}>
+    <button class="h-12 w-12 active:scale-90 transition-all self-auto mx-4 my-2" on:click={toggleSettings}>
       <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings h-full w-full stroke-current">
         <circle cx="12" cy="12" r="3"></circle>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
       </svg>
     </button>
     {#if isSettingsVisible}
-      <div in:fade out:fade class="z-10 transition-[background-color] duration-500 {currentTimerName !== WORK_TIMER && 'bg-lime-500'} bg-zinc-50 overflow-auto h-full">
+      <div in:fade out:fade class="z-10 transition-[background-color] duration-500 {currentTimerName !== WORK_TIMER ? 'bg-lime-500 dark:bg-lime-800' : 'bg-zinc-50 dark:bg-zinc-800'}  overflow-auto h-full">
         <Setting label="Work time, min" settings={[10, 15, 20, 25, 30, 50, 60, 90, 120]} isBreak={currentTimerName !== WORK_TIMER} />
         <div class="flex justify-between flex-wrap">
           <Setting label="Break time, min" settings={[5, 10, 15]} isBreak={currentTimerName !== WORK_TIMER} />
@@ -122,9 +138,22 @@
       </div>
     {/if}
   </div>
+  {#if browser}
+    <div class="absolute top-0 right-0 p-5 flex flex-col max-h-screen">
+      <button class="h-12 w-12 active:scale-90 transition-transform self-auto mx-4 my-2" on:click={toggleDarkMode}>
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings h-full w-full stroke-current">
+          {#if isDarkMode}
+            <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          {:else}
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          {/if}
+        </svg>
+      </button>
+    </div>
+  {/if}
   <div class="object-center self-center flex flex-col justify-center align-middle">
     <div class="text-6xl lg:text-9xl font-sans flex">
-      <button class="self-center h-14 w-14 lg:h-32 lg:w-32 {!session.length && 'invisible'} active:scale-95" on:click={prevSession}>
+      <button class="self-center h-14 w-14 lg:h-32 lg:w-32 {!session.length && 'invisible'} transition-transform active:scale-90" on:click={prevSession}>
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left h-full w-full stroke-current">
           <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
@@ -134,7 +163,7 @@
         <div class="{isTimerGoing && 'animate-pulse'} relative top-[-2px]">:</div>
         <div class="flex-1">{getRemainderSeconds($currentTimer)}</div>
       </div>
-      <button class="self-center flex h-14 w-14 lg:h-32 lg:w-32 active:scale-95" on:click={nextSession}>
+      <button class="self-center flex h-14 w-14 lg:h-32 lg:w-32 transition-transform active:scale-90" on:click={nextSession}>
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right h-full w-full stroke-current">
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>

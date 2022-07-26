@@ -1,3 +1,11 @@
+<script>
+	if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+		document.documentElement.classList.add('dark')
+	} else {
+		document.documentElement.classList.remove('dark')
+	}
+</script>
+
 <!DOCTYPE html>
 <html lang="en" class="text-gray-900 antialiased leading-tight">
 	<head>
@@ -9,7 +17,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
 		%sveltekit.head%
 	</head>
-	<body class="min-h-screen min-w-full bg-zinc-50">
+	<body class="min-h-screen min-w-full bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-200">
 		%sveltekit.body%
 	</body>
 </html>
