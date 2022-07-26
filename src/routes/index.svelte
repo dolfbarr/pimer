@@ -1,6 +1,7 @@
 <script>
   import { tweened } from 'svelte/motion'
-import {slide, fade, draw } from 'svelte/transition';
+  import { fade, draw } from 'svelte/transition'
+  import Setting from './setting.svelte'
 
   const SECOND_IN_MS = 1000
   const MINUTE_IN_MS = 60 * SECOND_IN_MS
@@ -28,6 +29,7 @@ import {slide, fade, draw } from 'svelte/transition';
   let session = []
   let isTimerGoing = false
   let isTimerPaused = false
+  let isSettingsVisible = false
 
   let currentTimer, currentTimerName
 
@@ -95,43 +97,57 @@ import {slide, fade, draw } from 'svelte/transition';
     session = [...session.slice(0, -1)]
     pickNextTimer()
   }
+
+  const toggleSettings = () => {
+    isSettingsVisible = !isSettingsVisible
+  }
 </script>
 
-<div class="container relative mx-auto min-h-screen min-w-full flex justify-center transition-all {currentTimerName !== WORK_TIMER && 'bg-lime-500'} {currentTimerName !== WORK_TIMER && 'text-white'}">
-  <div class="absolute top-0 right-0 m-5">
-    <button class="self-center h-16 w-16 hover:rotate-180 transition-all">
+<div class="container relative mx-auto min-h-screen min-w-full flex justify-center transition-[background-color] duration-500 {currentTimerName !== WORK_TIMER && 'bg-lime-500'} {currentTimerName !== WORK_TIMER && 'text-white'}">
+  <div class="absolute top-0 left-0 p-5 flex flex-col max-h-screen">
+    <button class="h-12 w-12 active:scale-95 transition-all self-auto mx-4 my-2" on:click={toggleSettings}>
       <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings h-full w-full stroke-current">
         <circle cx="12" cy="12" r="3"></circle>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
       </svg>
     </button>
-  </div>
-    <div class="object-center self-center flex flex-col justify-center align-middle">
-      <div class="text-9xl font-sans flex">
-        <button class="self-center h-32 w-32 {!session.length && 'invisible'}" on:click={prevSession}>
-          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left h-full w-full stroke-current">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </button>
-        <div class="text-center flex just font-mono relative top-[-3px]">
-          <div class="flex-1">{getFullMinutes($currentTimer)}</div>
-          <div class="{isTimerGoing && 'animate-pulse'} relative top-[-8px]">:</div>
-          <div class="flex-1">{getRemainderSeconds($currentTimer)}</div>
+    {#if isSettingsVisible}
+      <div in:fade out:fade class="z-10 transition-[background-color] duration-500 {currentTimerName !== WORK_TIMER && 'bg-lime-500'} bg-zinc-50 overflow-auto h-full">
+        <Setting label="Work time, min" settings={[10, 15, 20, 25, 30, 50, 60, 90, 120]} isBreak={currentTimerName !== WORK_TIMER} />
+        <div class="flex justify-between flex-wrap">
+          <Setting label="Break time, min" settings={[5, 10, 15]} isBreak={currentTimerName !== WORK_TIMER} />
+          <Setting label="Long break time, min" settings={[15, 20, 30]} isBreak={currentTimerName !== WORK_TIMER} />
         </div>
-        <button class="self-center flex h-32 w-32" on:click={nextSession}>
-         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right h-full w-full stroke-current">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
+        <Setting label="Session count" settings={[1, 2, 3, 4, 5, 6, 7, 8, 9]} isBreak={currentTimerName !== WORK_TIMER} />
       </div>
-      <button class="self-center mt-8 h-16 w-16" on:click={isTimerGoing ? pauseTimer : startTimer}>
-        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-play h-full w-full stroke-current">
-          {#if isTimerGoing && !isTimerPaused}
-            <rect x="6" y="4" width="4" height="16" in:draw out:fade></rect><rect x="14" y="4" width="4" height="16" in:draw out:fade></rect>
-          {:else}
-            <polygon points="5 3 19 12 5 21 5 3" in:draw out:fade></polygon>
-          {/if}
+    {/if}
+  </div>
+  <div class="object-center self-center flex flex-col justify-center align-middle">
+    <div class="text-6xl lg:text-9xl font-sans flex">
+      <button class="self-center h-14 w-14 lg:h-32 lg:w-32 {!session.length && 'invisible'} active:scale-95" on:click={prevSession}>
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left h-full w-full stroke-current">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="text-center flex font-mono relative top-[-3px]">
+        <div class="flex-1">{getFullMinutes($currentTimer)}</div>
+        <div class="{isTimerGoing && 'animate-pulse'} relative top-[-2px]">:</div>
+        <div class="flex-1">{getRemainderSeconds($currentTimer)}</div>
+      </div>
+      <button class="self-center flex h-14 w-14 lg:h-32 lg:w-32 active:scale-95" on:click={nextSession}>
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right h-full w-full stroke-current">
+          <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
       </button>
     </div>
+    <button class="self-center mt-8 h-16 w-16 lg:h-20 lg:w-20" on:click={isTimerGoing ? pauseTimer : startTimer}>
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-play h-full w-full stroke-current">
+        {#if isTimerGoing && !isTimerPaused}
+          <rect x="6" y="4" width="4" height="16" in:draw out:fade></rect><rect x="14" y="4" width="4" height="16" in:draw out:fade></rect>
+        {:else}
+          <polygon points="5 3 19 12 5 21 5 3" in:draw out:fade></polygon>
+        {/if}
+      </svg>
+    </button>
+  </div>
 </div>
