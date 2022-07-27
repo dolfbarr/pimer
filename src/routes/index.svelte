@@ -8,6 +8,7 @@
   import PrevIcon from '../icons/prev.icon.svelte'
   import NextIcon from '../icons/next.icon.svelte'
   import PlayIcon from '../icons/play.icon.svelte'
+  import ResetIcon from '../icons/reset.icon.svelte'
 
   const SECOND_IN_MS = 1000
   const MINUTE_IN_MS = 60 * SECOND_IN_MS
@@ -109,6 +110,21 @@
     isSettingsVisible = !isSettingsVisible
   }
 
+  const resetAll = () => {
+    if (browser) {
+      localStorage.removeItem('theme')
+    }
+    isTimerGoing = false
+    clearInterval(timerInterval)
+    session = []
+    pickNextTimer()
+    if (browser && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }
+
   const toggleDarkMode = () => {
     if (browser) {
       if (document.documentElement.classList.contains('dark')) {
@@ -136,9 +152,15 @@
   class="container relative mx-auto flex min-h-screen min-w-full justify-center {getBackgroundColor(currentTimerName)}">
   <!-- Floating settings button -->
   <div class="absolute top-0 left-0 flex max-h-screen flex-col p-5">
-    <button class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90" on:click={toggleSettings}>
-      <SettingsIcon />
-    </button>
+    <div class="flex gap-2">
+      <button class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90" on:click={toggleSettings}>
+        <SettingsIcon />
+      </button>
+
+      <button class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90" on:click={resetAll}>
+        <ResetIcon />
+      </button>
+    </div>
 
     <!-- Settings block -->
     {#if isSettingsVisible}
@@ -193,7 +215,7 @@
     </button>
   </div>
 
-  <div class="absolute bottom-0 m-2 flex flex-wrap gap-2 justify-center overflow-auto max-h-40">
+  <div class="absolute bottom-0 m-2 flex max-h-40 flex-wrap justify-center gap-2 overflow-auto">
     {#each session as sessionName}
       <div
         class="h-4 {sessionName === LONG_BREAK_TIMER
