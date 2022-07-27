@@ -192,4 +192,15 @@
       <PlayIcon isPlaying={isTimerGoing && !isTimerPaused} />
     </button>
   </div>
+
+  <div class="absolute bottom-0 m-2 flex flex-wrap gap-2 justify-center overflow-auto max-h-40">
+    {#each session as sessionName}
+      <div
+        class="h-4 {sessionName === LONG_BREAK_TIMER
+          ? 'w-10'
+          : 'w-4'} rounded-full border-2 border-solid border-current {[LONG_BREAK_TIMER, BREAK_TIMER].includes(
+          sessionName,
+        ) && 'bg-current'} " />
+    {/each}
+  </div>
 </div>
