@@ -252,7 +252,7 @@
 
   <!-- Session log block -->
   <div
-    class="absolute top-0 m-2 mt-7 flex h-48 max-h-12 max-w-xl flex-wrap content-center justify-center gap-2 overflow-auto"
+    class="absolute top-24 m-2 flex h-48 max-h-10 max-w-xl flex-wrap content-center  justify-center gap-2 overflow-auto lg:top-7 lg:max-h-12 landscape:invisible landscape:lg:visible"
     bind:this={sessionLogContainer}>
     {#each session as { timer, task }}
       <div
@@ -296,7 +296,9 @@
       </button>
     </div>
 
-    <button class="mt-8 h-16 w-16 self-center lg:h-20 lg:w-20" on:click={isTimerGoing ? pauseTimer : startTimer}>
+    <button
+      class="mt-2 h-16 w-16 self-center lg:mt-8 lg:h-20 lg:w-20"
+      on:click={isTimerGoing ? pauseTimer : startTimer}>
       <PlayIcon isPlaying={isTimerGoing && !isTimerPaused} />
     </button>
   </div>
