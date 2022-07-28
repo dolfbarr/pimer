@@ -304,11 +304,11 @@
   </div>
 
   <!-- Task name input -->
-  <div class="absolute bottom-0 m-2 mb-7 justify-center gap-2 overflow-auto file:after:odd:backdrop:flex">
+  <div class="absolute bottom-7 m-2 justify-center gap-2 overflow-auto file:after:odd:backdrop:flex">
     <span
       role="textbox"
       contenteditable
-      class="z-10 appearance-none {getBackgroundColor(currentTimerName)} p-3 text-center text-3xl focus:outline-none"
+      class="z-10 appearance-none {getBackgroundColor(currentTimerName)} text-center text-3xl focus:outline-none"
       bind:innerHTML={currentTask} />
   </div>
 </div>
