@@ -1,0 +1,87 @@
+<script>
+  if (!localStorage.settings) {
+    localStorage.settings = {}
+  }
+
+  if (
+    localStorage.theme === 'dark' ||
+    (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  ) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+</script>
+
+<!DOCTYPE html>
+<html lang="en" class="leading-tight text-gray-900 antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+    <meta http-equiv="content-security-policy" content="">
+	<link rel="stylesheet" href="/_app/immutable/assets/__layout-32d8775a.css">
+	<link rel="modulepreload" href="/_app/immutable/start-25fffbac.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-81c5949b.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-fb92d811.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-f5e7efff.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/index.svelte-16da03fd.js">
+  </head>
+  <body
+    class="min-h-screen min-w-full bg-zinc-50 transition-[background-color] duration-500 dark:bg-zinc-800 dark:text-zinc-200">
+    
+
+
+
+<div class="container relative mx-auto flex min-h-screen min-w-full justify-center transition-[background-color] duration-500 false false bg-zinc-50 dark:bg-zinc-800">
+  <div class="absolute top-0 left-0 flex max-h-screen flex-col p-5"><div class="flex gap-2"><button class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings h-full w-full stroke-current"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+
+      <button class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw h-full w-full stroke-current"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg></button></div>
+
+    
+    </div>
+
+  
+  <div class="absolute top-0 m-2 mt-7 flex h-48 max-h-12 max-w-xl flex-wrap content-center justify-center gap-2 overflow-auto"></div>
+
+  
+  
+
+  
+  <div class="flex flex-col justify-center self-center object-center align-middle"><div class="flex font-sans text-6xl lg:text-9xl"><button class="h-14 w-14 self-center lg:h-32 lg:w-32 invisible transition-transform active:scale-90"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left h-full w-full stroke-current"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+
+      <div class="relative top-[-3px] flex text-center font-mono"><div class="flex-1">25</div>
+        <div class="false relative top-[-2px] lg:top-[-10px]">:</div>
+        <div class="flex-1">00</div></div>
+
+      <button class="flex h-14 w-14 self-center transition-transform active:scale-90 lg:h-32 lg:w-32"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right h-full w-full stroke-current"><polyline points="9 18 15 12 9 6"></polyline></svg></button></div>
+
+    <button class="mt-8 h-16 w-16 self-center lg:h-20 lg:w-20"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-play h-full w-full stroke-current"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button></div>
+
+  
+  <div class="absolute bottom-0 m-2 mb-7 justify-center gap-2 overflow-auto file:after:odd:backdrop:flex"><span role="textbox" contenteditable class="z-10 appearance-none transition-[background-color] duration-500 false false bg-zinc-50 dark:bg-zinc-800 p-3 text-center text-3xl focus:outline-none">Work</span></div></div>
+
+
+		<script type="module" data-sveltekit-hydrate="1m0utex">
+		import { start } from "/_app/immutable/start-25fffbac.js";
+		start({
+			target: document.querySelector('[data-sveltekit-hydrate="1m0utex"]').parentNode,
+			paths: {"base":"","assets":""},
+			session: {},
+			route: true,
+			spa: false,
+			trailing_slash: "never",
+			hydrate: {
+				status: 200,
+				error: null,
+				nodes: [0, 2],
+				params: {},
+				routeId: ""
+			}
+		});
+	</script>
+  </body>
+</html>
