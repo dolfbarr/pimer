@@ -2,6 +2,7 @@
   import {browser} from '$app/env'
   import {tweened} from 'svelte/motion'
   import {fade} from 'svelte/transition'
+  import {writable} from 'svelte/store'
   import Setting from '../components/setting.svelte'
   import SettingsIcon from '../icons/settings.icon.svelte'
   import ModeIcon from '../icons/mode.icon.svelte'
@@ -16,7 +17,15 @@
   const WORK_TIMER = 'WORK_TIMER'
   const BREAK_TIMER = 'BREAK_TIMER'
   const LONG_BREAK_TIMER = 'LONG_BREAK_TIMER'
-  const LONG_BREAK_APPEAR = 4
+  const LONG_BREAK_APPEAR = 'LONG_BREAK_APPEAR'
+
+  const DEFAULT_CURRENT_WORK_TASK = 'Work'
+  const DEFAULT_BREAK_TASK = 'Break'
+
+  const DEFAULT_LONG_BREAK_APPEAR = 4
+  const DEFAULT_WORK_TIME = 25 * MINUTE_IN_MS
+  const DEFAULT_BREAK_TIME = 5 * MINUTE_IN_MS
+  const DEFAULT_LONG_BREAK_TIME = 30 * MINUTE_IN_MS
 
   const renderTime = (time) => time.toString().padStart(2, '0')
 
@@ -24,36 +33,51 @@
     return renderTime(Math.floor(totalTimeInMs / MINUTE_IN_MS))
   }
 
+  const getDefaultValue = (value, setting) => {
+    if (browser && localStorage[setting]) {
+      return localStorage[setting]
+    }
+    return value
+  }
+
   const getRemainderSeconds = (totalTimeInMs) => {
     return renderTime(Math.floor((totalTimeInMs - Number(getFullMinutes(totalTimeInMs)) * MINUTE_IN_MS) / SECOND_IN_MS))
   }
 
-  const timers = {
-    [WORK_TIMER]: 0.1 * MINUTE_IN_MS,
-    [BREAK_TIMER]: 0.1 * MINUTE_IN_MS,
-    [LONG_BREAK_TIMER]: 0.2 * MINUTE_IN_MS,
-  }
+  let settings = writable({
+    [WORK_TIMER]: getDefaultValue(DEFAULT_WORK_TIME, WORK_TIMER),
+    [BREAK_TIMER]: getDefaultValue(DEFAULT_BREAK_TIME, BREAK_TIMER),
+    [LONG_BREAK_TIMER]: getDefaultValue(DEFAULT_LONG_BREAK_TIME, LONG_BREAK_TIMER),
+    [LONG_BREAK_APPEAR]: getDefaultValue(DEFAULT_LONG_BREAK_APPEAR, LONG_BREAK_APPEAR),
+  })
+
   let session = []
+  let currentTask = DEFAULT_CURRENT_WORK_TASK
   let isTimerGoing = false
   let isTimerPaused = false
   let isSettingsVisible = false
   let isDarkMode = browser && (localStorage.theme === 'dark' || document.documentElement.classList.contains('dark'))
 
+  let settingsContainer
+  let sessionLogContainer
+
   let currentTimer, currentTimerName
 
   const pickNextTimer = () => {
-    if (session.length && session[session.length - 1] === WORK_TIMER) {
-      if (session.length % (LONG_BREAK_APPEAR * 2 - 1) === 0) {
-        currentTimer = tweened(timers[LONG_BREAK_TIMER])
+    if (session.length && session[session.length - 1].timer === WORK_TIMER) {
+      if (session.length % ($settings[LONG_BREAK_APPEAR] * 2 - 1) === 0) {
+        currentTimer = tweened(Number($settings[LONG_BREAK_TIMER]))
         currentTimerName = LONG_BREAK_TIMER
       } else {
-        currentTimer = tweened(timers[BREAK_TIMER])
+        currentTimer = tweened(Number($settings[BREAK_TIMER]))
         currentTimerName = BREAK_TIMER
       }
     } else {
-      currentTimer = tweened(timers[WORK_TIMER])
+      currentTimer = tweened(Number($settings[WORK_TIMER]))
       currentTimerName = WORK_TIMER
     }
+
+    currentTask = currentTimerName !== WORK_TIMER ? DEFAULT_BREAK_TASK : DEFAULT_CURRENT_WORK_TASK
   }
 
   pickNextTimer()
@@ -80,7 +104,7 @@
 
       if ($currentTimer === 0 && isTimerGoing) {
         isTimerGoing = false
-        session = [...session, currentTimerName]
+        session = [...session, {timer: currentTimerName, task: currentTask}]
         pickNextTimer()
         clearInterval(timerInterval)
 
@@ -95,7 +119,8 @@
   const nextSession = () => {
     isTimerGoing = false
     clearInterval(timerInterval)
-    session = [...session, currentTimerName]
+    session = [...session, {timer: currentTimerName, task: currentTask}]
+    scrollToBottom(sessionLogContainer)
     pickNextTimer()
   }
 
@@ -103,6 +128,7 @@
     isTimerGoing = false
     clearInterval(timerInterval)
     session = [...session.slice(0, -1)]
+    scrollToBottom(sessionLogContainer)
     pickNextTimer()
   }
 
@@ -110,18 +136,19 @@
     isSettingsVisible = !isSettingsVisible
   }
 
-  const resetAll = () => {
-    if (browser) {
-      localStorage.removeItem('theme')
-    }
+  const resetAll = (clearTheme = true) => {
     isTimerGoing = false
     clearInterval(timerInterval)
     session = []
     pickNextTimer()
-    if (browser && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
+    if (clearTheme && browser) {
+      localStorage.removeItem('theme')
+
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
     }
   }
 
@@ -144,14 +171,42 @@
   const getBackgroundColor = (current) => {
     return `transition-[background-color] duration-500 ${isBreak(current) && 'bg-lime-500 dark:bg-lime-800'} ${
       isBreak(current) && 'text-white dark:text-zinc-200'
-    }`
+    } bg-zinc-50 dark:bg-zinc-800`
+  }
+
+  const setSettingValue = (value, setting) => {
+    if ([WORK_TIMER, BREAK_TIMER, LONG_BREAK_TIMER].includes(setting)) {
+      value *= MINUTE_IN_MS
+    }
+
+    settings.update((current) => {
+      current[setting] = value
+      return current
+    })
+
+    if (browser) {
+      localStorage[setting] = value
+    }
+
+    resetAll(false)
+  }
+
+  const onWindowClick = (e) => {
+    if (!settingsContainer.contains(e.target) && isSettingsVisible) {
+      isSettingsVisible = false
+    }
+  }
+
+  const scrollToBottom = async (node) => {
+    node.scroll({top: node.scrollHeight, behavior: 'smooth'})
   }
 </script>
 
+<svelte:window on:click={onWindowClick} />
 <div
   class="container relative mx-auto flex min-h-screen min-w-full justify-center {getBackgroundColor(currentTimerName)}">
   <!-- Floating settings button -->
-  <div class="absolute top-0 left-0 flex max-h-screen flex-col p-5">
+  <div class="absolute top-0 left-0 flex max-h-screen flex-col p-5" bind:this={settingsContainer}>
     <div class="flex gap-2">
       <button class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90" on:click={toggleSettings}>
         <SettingsIcon />
@@ -168,14 +223,45 @@
         <Setting
           label="Work time, min"
           settings={[10, 15, 20, 25, 30, 50, 60, 90, 120]}
+          onChange={(value) => setSettingValue(Number(value), WORK_TIMER)}
+          defaultValue={$settings[WORK_TIMER] / MINUTE_IN_MS}
           isBreak={isBreak(currentTimerName)} />
         <div class="flex flex-wrap justify-between">
-          <Setting label="Break time, min" settings={[5, 10, 15]} isBreak={isBreak(currentTimerName)} />
-          <Setting label="Long break time, min" settings={[15, 20, 30]} isBreak={isBreak(currentTimerName)} />
+          <Setting
+            label="Break time, min"
+            settings={[5, 10, 15]}
+            isBreak={isBreak(currentTimerName)}
+            defaultValue={$settings[BREAK_TIMER] / MINUTE_IN_MS}
+            onChange={(value) => setSettingValue(Number(value), BREAK_TIMER)} />
+          <Setting
+            label="Long break time, min"
+            settings={[15, 20, 30]}
+            isBreak={isBreak(currentTimerName)}
+            defaultValue={$settings[LONG_BREAK_TIMER] / MINUTE_IN_MS}
+            onChange={(value) => setSettingValue(Number(value), LONG_BREAK_TIMER)} />
         </div>
-        <Setting label="Session count" settings={[1, 2, 3, 4, 5, 6, 7, 8, 9]} isBreak={isBreak(currentTimerName)} />
+        <Setting
+          label="Session count"
+          settings={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          isBreak={isBreak(currentTimerName)}
+          defaultValue={$settings[LONG_BREAK_APPEAR]}
+          onChange={(value) => setSettingValue(Number(value), LONG_BREAK_APPEAR)} />
       </div>
     {/if}
+  </div>
+
+  <!-- Session log block -->
+  <div
+    class="absolute top-0 m-2 mt-7 flex h-48 max-h-12 max-w-xl flex-wrap content-center justify-center gap-2 overflow-auto"
+    bind:this={sessionLogContainer}>
+    {#each session as { timer, task }}
+      <div
+        title={task}
+        class="h-4 {timer === LONG_BREAK_TIMER ? 'w-10' : 'w-4'} rounded-full border-2 border-solid border-current {[
+          LONG_BREAK_TIMER,
+          BREAK_TIMER,
+        ].includes(timer) && 'bg-current'} " />
+    {/each}
   </div>
 
   <!-- Floating mode button -->
@@ -199,7 +285,7 @@
 
       <div class="relative top-[-3px] flex text-center font-mono">
         <div class="flex-1">{getFullMinutes($currentTimer)}</div>
-        <div class="{isTimerGoing && 'animate-pulse'} relative top-[-2px]">:</div>
+        <div class="{isTimerGoing && 'animate-pulse'} relative top-[-2px] lg:top-[-10px]">:</div>
         <div class="flex-1">{getRemainderSeconds($currentTimer)}</div>
       </div>
 
@@ -215,14 +301,12 @@
     </button>
   </div>
 
-  <div class="absolute bottom-0 m-2 flex max-h-40 flex-wrap justify-center gap-2 overflow-auto">
-    {#each session as sessionName}
-      <div
-        class="h-4 {sessionName === LONG_BREAK_TIMER
-          ? 'w-10'
-          : 'w-4'} rounded-full border-2 border-solid border-current {[LONG_BREAK_TIMER, BREAK_TIMER].includes(
-          sessionName,
-        ) && 'bg-current'} " />
-    {/each}
+  <!-- Task name input -->
+  <div class="absolute bottom-0 m-2 mb-7 justify-center gap-2 overflow-auto file:after:odd:backdrop:flex">
+    <span
+      role="textbox"
+      contenteditable
+      class="z-10 appearance-none {getBackgroundColor(currentTimerName)} p-3 text-center text-3xl focus:outline-none"
+      bind:innerHTML={currentTask} />
   </div>
 </div>

@@ -2,6 +2,10 @@
   export let label
   export let isBreak
   export let settings
+  export let onChange
+  export let defaultValue = ''
+
+  export let value = defaultValue
 </script>
 
 <div>
@@ -16,11 +20,18 @@
       <input
         placeholder="?"
         type="text"
+        {value}
+        on:input={(event) => onChange(event.currentTarget.value)}
         class="appearance-none {isBreak
           ? 'bg-zing-white dark:bg-zinc-200 text-lime-500 dark:text-lime-800'
           : 'bg-gray-900 dark:bg-zinc-200 text-zinc-50 dark:text-zinc-800'} border-10 w-10 rounded border-current p-1 text-center accent-black" />
       {#each settings as setting}
-        <button class="w-10 rounded border-2 border-current p-1">{setting.toString()}</button>
+        <button
+          class="w-10 self-auto rounded border-2 border-current p-1 transition-all active:scale-90"
+          on:click={() => {
+            onChange(setting.toString())
+            value = setting.toString()
+          }}>{setting.toString()}</button>
       {/each}
     </div>
   </div>
