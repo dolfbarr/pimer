@@ -208,18 +208,28 @@
   <!-- Floating settings button -->
   <div class="absolute top-0 left-0 flex max-h-screen flex-col p-5" bind:this={settingsContainer}>
     <div class="flex gap-2">
-      <button class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90" on:click={toggleSettings}>
+      <button
+        class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90"
+        on:click={toggleSettings}
+        data-testid="settings-button">
         <SettingsIcon />
       </button>
 
-      <button class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90" on:click={resetAll}>
+      <button
+        class="mx-4 my-2 h-12 w-12 self-auto transition-all active:scale-90"
+        on:click={resetAll}
+        data-testid="reset-button">
         <ResetIcon />
       </button>
     </div>
 
     <!-- Settings block -->
     {#if isSettingsVisible}
-      <div in:fade out:fade class="z-10 {getBackgroundColor(currentTimerName)} h-full overflow-auto">
+      <div
+        in:fade
+        out:fade
+        class="z-10 {getBackgroundColor(currentTimerName)} h-full overflow-auto"
+        data-testid="settings-container">
         <Setting
           label="Work time, min"
           settings={[10, 15, 20, 25, 30, 50, 60, 90, 120]}
@@ -253,10 +263,12 @@
   <!-- Session log block -->
   <div
     class="absolute top-24 m-2 flex h-48 max-h-10 max-w-xl flex-wrap content-center  justify-center gap-2 overflow-auto lg:top-7 lg:max-h-12 landscape:invisible landscape:lg:visible"
+    data-testid="sessions-container"
     bind:this={sessionLogContainer}>
     {#each session as { timer, task }}
       <div
         title={task}
+        data-testid="session-dot"
         class="h-4 {timer === LONG_BREAK_TIMER ? 'w-10' : 'w-4'} rounded-full border-2 border-solid border-current {[
           LONG_BREAK_TIMER,
           BREAK_TIMER,
@@ -266,7 +278,7 @@
 
   <!-- Floating mode button -->
   {#if browser}
-    <div class="absolute top-0 right-0 flex max-h-screen flex-col p-5">
+    <div class="absolute top-0 right-0 flex max-h-screen flex-col p-5" data-testid="mode-button">
       <button class="mx-4 my-2 h-12 w-12 self-auto transition-transform active:scale-90" on:click={toggleDarkMode}>
         <ModeIcon {isDarkMode} />
       </button>
@@ -274,22 +286,24 @@
   {/if}
 
   <!-- Timer block -->
-  <div class="flex flex-col justify-center self-center object-center align-middle">
+  <div class="flex flex-col justify-center self-center object-center align-middle" data-testid="timer">
     <div class="flex font-sans text-6xl lg:text-9xl">
       <button
+        data-testid="prev-button"
         class="h-14 w-14 self-center lg:h-32 lg:w-32 {!session.length &&
           'invisible'} transition-transform active:scale-90"
         on:click={prevSession}>
         <PrevIcon />
       </button>
 
-      <div class="relative top-[-3px] flex text-center font-mono">
+      <div class="relative top-[-3px] flex text-center font-mono" data-testid="timer-count">
         <div class="flex-1">{getFullMinutes($currentTimer)}</div>
         <div class="{isTimerGoing && 'animate-pulse'} relative top-[-2px] lg:top-[-10px]">:</div>
         <div class="flex-1">{getRemainderSeconds($currentTimer)}</div>
       </div>
 
       <button
+        data-testid="next-button"
         class="flex h-14 w-14 self-center transition-transform active:scale-90 lg:h-32 lg:w-32"
         on:click={nextSession}>
         <NextIcon />
@@ -298,13 +312,16 @@
 
     <button
       class="mt-2 h-16 w-16 self-center lg:mt-8 lg:h-20 lg:w-20"
+      data-testid="play-button"
       on:click={isTimerGoing ? pauseTimer : startTimer}>
       <PlayIcon isPlaying={isTimerGoing && !isTimerPaused} />
     </button>
   </div>
 
   <!-- Task name input -->
-  <div class="absolute bottom-7 m-2 justify-center gap-2 overflow-auto file:after:odd:backdrop:flex">
+  <div
+    class="absolute bottom-7 m-2 justify-center gap-2 overflow-auto file:after:odd:backdrop:flex"
+    data-testid="task-name">
     <span
       role="textbox"
       contenteditable
