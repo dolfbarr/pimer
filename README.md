@@ -26,11 +26,13 @@ npm run dev -- --open
 ```
 
 Don't forget to add:
+
 ```json
 {
-   "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
 ```
+
 to your vscode settings, if you are using it :)
 
 ## Building

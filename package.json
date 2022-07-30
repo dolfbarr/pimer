@@ -2,6 +2,7 @@
   "name": "pimer",
   "version": "0.0.1",
   "scripts": {
+    "start": "npm run dev -- --open",
     "dev": "NODE_ENV=development vite dev",
     "build": "vite build",
     "package": "svelte-kit package",

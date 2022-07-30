@@ -3,6 +3,6 @@
   fill="none"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="feather feather-chevron-right h-full w-full stroke-current">
+  class="feather feather-chevron-right ml-[-25%] mt-[-25%] h-[150%] w-[150%] stroke-current">
   <polyline points="9 18 15 12 9 6" />
 </svg>

@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom'
-import { render, screen, fireEvent, act } from '@testing-library/svelte'
-import { vi } from 'vitest'
+import {render, screen, fireEvent} from '@testing-library/svelte'
+import {vi, describe, it, expect} from 'vitest'
 
 import Pimer from '../index.svelte'
 
-window.HTMLElement.prototype.scroll = vi.fn();
+window.HTMLElement.prototype.scroll = vi.fn()
 
 vi.mock('svelte/transition', () => ({
   fade: vi.fn(),
