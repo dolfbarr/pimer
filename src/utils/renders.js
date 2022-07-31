@@ -3,7 +3,9 @@ import {MINUTE_IN_MS, SECOND_IN_MS} from '../constants'
 
 export const getBackgroundColor = (current) => {
   return `transition-[background-color] duration-500 ${
-    isBreak(current) ? 'text-white dark:text-zinc-200 bg-lime-500 dark:bg-lime-800' : 'bg-zinc-50 dark:bg-zinc-800'
+    isBreak(current)
+      ? 'text-white dark:text-zinc-200 bg-lime-500 dark:bg-lime-800'
+      : 'bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-200'
   }`
 }
 
