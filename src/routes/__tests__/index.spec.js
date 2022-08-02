@@ -1,10 +1,14 @@
 import '@testing-library/jest-dom'
 import {render, screen, fireEvent} from '@testing-library/svelte'
-import {vi, describe, it, expect} from 'vitest'
+import {vi, describe, it, expect, beforeAll} from 'vitest'
 
 import Pimer from '../index.svelte'
 
 window.HTMLElement.prototype.scroll = vi.fn()
+
+window.Notification = {
+  requestPermission: vi.fn(),
+}
 
 vi.mock('svelte/transition', () => ({
   fade: vi.fn(),
@@ -12,6 +16,22 @@ vi.mock('svelte/transition', () => ({
 }))
 
 describe('Pimer', () => {
+  beforeAll(() => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(), // Deprecated
+        removeListener: vi.fn(), // Deprecated
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    })
+  })
+
   it('renders', () => {
     render(Pimer)
 

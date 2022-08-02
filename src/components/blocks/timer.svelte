@@ -1,6 +1,6 @@
 <script>
   import {onMount} from 'svelte'
-  import {SECOND_IN_MS, BREAK_TIMER} from '../../constants'
+  import {SECOND_IN_MS} from '../../constants'
   import {
     isTimerPaused,
     isTimerGoing,
@@ -19,6 +19,7 @@
   import Button from '../button.svelte'
 
   export let sessionContainer = null
+  let permission = null
 
   const pauseTimer = () => {
     isTimerPaused.set(!$isTimerPaused)
@@ -30,7 +31,7 @@
     timerInterval.set(
       setInterval(function () {
         if (!$isTimerGoing) clearInterval(timerInterval)
-        if (!$isTimerPaused && $currentTimer > 0) currentTimer.set($currentTimer - 1000)
+        if (!$isTimerPaused && $currentTimer > 0) currentTimer.set($currentTimer - SECOND_IN_MS)
 
         if ($currentTimer === 0 && $isTimerGoing) {
           isTimerGoing.set(false)
@@ -38,9 +39,11 @@
           pickNextTimer()
           clearInterval($timerInterval)
 
-          // Break timer autostart
-          if ($currentTimerName === BREAK_TIMER) {
-            startTimer()
+          if (permission) {
+            new Notification($currentTask, {
+              vibrate: [500, 100, 500],
+              body: `Time's up`,
+            })
           }
         }
       }, SECOND_IN_MS),
@@ -63,8 +66,19 @@
     pickNextTimer()
   }
 
+  const requestNotificationPermission = async () => {
+    const permission = await window.Notification.requestPermission()
+    if (permission !== 'granted') {
+      return null
+    }
+
+    return permission
+  }
+
   onMount(async () => {
     pickNextTimer()
+
+    permission = await requestNotificationPermission()
   })
 </script>
 
