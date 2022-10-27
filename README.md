@@ -1,4 +1,7 @@
-# Pimer
+# Pimer: small pomidoro timer
+
+<img width="1392" alt="Pimer: pomidoro timer" src="https://user-images.githubusercontent.com/15245834/198347281-4e6f9e17-53e2-4e16-b39f-da1f76a4017e.png">
+
 
 ## Developing
 
