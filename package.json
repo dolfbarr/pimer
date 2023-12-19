@@ -31,7 +31,7 @@
     "eslint-plugin-testing-library": "^5.5.1",
     "global-jsdom": "^8.5.0",
     "jsdom": "^20.0.0",
-    "postcss": "^8.4.14",
+    "postcss": "^8.4.31",
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.7.0",
     "prettier-plugin-tailwindcss": "^0.1.13",
